@@ -1,0 +1,37 @@
+import smbus
+import time
+
+DEVICE     = 0x23 # Default I2C address
+
+POWER_DOWN = 0x00 # Power off
+POWER_ON   = 0x01 # Power on
+RESET      = 0x07 # Reset data register
+
+bus = smbus.SMBus(1)  # Get I2C bus
+
+def convertValue(data):
+  # convert 2 bytes of data into a decimal number.
+  result=(data[1] + (256 * data[0])) / 1.2
+  return (result)
+
+def readLight(addr=DEVICE):
+  # Get data from I2C interface
+  data = bus.read_i2c_block_data(addr,0x20)
+  return convertValue(data)
+
+while True:
+    lightLevel=readLight()
+    if lightLevel <= 10:
+        print("Light Level : " + format(lightLevel,'.2f') + " lx" + "     TOO DARK")
+    else:
+        if lightLevel <= 50:
+            print("Light Level : " + format(lightLevel,'.2f') + " lx" + "     DARK")
+        else:
+            if lightLevel <=200:
+                print("Light Level : " + format(lightLevel,'.2f') + " lx" + "     MEDIUM")
+            else:
+                if lightLevel <= 500:
+                    print("Light Level : " + format(lightLevel,'.2f') + " lx" + "     BRIGHT")
+                else:
+                    print("Light Level : " + format(lightLevel,'.2f') + " lx" + "     TOO BRIGHT")
+    time.sleep(0.5)
